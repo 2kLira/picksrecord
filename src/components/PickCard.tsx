@@ -93,7 +93,7 @@ export function PickCard({ pick, index = 0 }: { pick: Pick; index?: number }) {
                       {t.pickTypes[pick.pick_type]}
                     </span>
                     <h3 className="mt-2 truncate font-display text-base font-semibold">{pick.match_name}</h3>
-                    <p className="truncate text-sm text-muted">{pick.selection}</p>
+                    {!pick.legs && <p className="truncate text-sm text-muted">{pick.selection}</p>}
                   </div>
                   <div className="text-right">
                     <div className="font-mono text-lg font-semibold tabular-nums">
@@ -104,6 +104,22 @@ export function PickCard({ pick, index = 0 }: { pick: Pick; index?: number }) {
                     </div>
                   </div>
                 </div>
+
+                {pick.legs && (
+                  <ul className="mt-3 space-y-1.5 rounded-xl border border-hair bg-base-2/40 p-3">
+                    {pick.legs.map((leg, i) => (
+                      <li key={i} className="flex items-center gap-2 text-sm">
+                        <span className="grid h-4 w-4 flex-none place-items-center rounded bg-elevated font-mono text-[10px] text-faint">
+                          {i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-muted">{leg.selection}</span>
+                        <span className="flex-none font-mono text-xs text-faint">
+                          {formatOdds(leg.odds, pick.odds_format)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
                 {pick.notes && <p className="mt-3 line-clamp-2 text-sm text-faint">{pick.notes}</p>}
 

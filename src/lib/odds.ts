@@ -62,6 +62,22 @@ export function convertOdds(odds: number, from: OddsFormat, to: OddsFormat): num
   return 0;
 }
 
+/**
+ * Combined odds of a parlay: the product of each leg's decimal odds, returned in `format`.
+ * Legs that are blank/invalid (<= 1 decimal) are ignored. Returns 0 when nothing valid.
+ */
+export function combineParlayOdds(legOdds: number[], format: OddsFormat): number {
+  const decimals = legOdds
+    .map((o) => (format === "decimal" ? o : convertOdds(o, "american", "decimal")))
+    .filter((d) => Number.isFinite(d) && d > 1);
+
+  if (decimals.length === 0) return 0;
+
+  const combinedDecimal = decimals.reduce((acc, d) => acc * d, 1);
+  if (format === "decimal") return round2(combinedDecimal);
+  return convertOdds(round2(combinedDecimal), "decimal", "american");
+}
+
 /** Implied win probability (0–1) from the odds. */
 export function impliedProbability(odds: number, format: OddsFormat): number {
   const decimal = format === "decimal" ? odds : convertOdds(odds, "american", "decimal");

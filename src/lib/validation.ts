@@ -38,6 +38,15 @@ export const eventSchema = z.object({
   event_date: z.string().optional().or(z.literal("")),
 });
 
+export const parlayLegSchema = z.object({
+  selection: z.string().trim().min(1, "Add the selection").max(160),
+  odds: z.coerce.number().refine((v) => v !== 0, "Enter valid odds"),
+});
+
+export const parlayLegsSchema = z
+  .array(parlayLegSchema)
+  .min(2, "A parlay needs at least 2 selections");
+
 export const pickSchema = z.object({
   event_id: z.string().uuid("Pick an event"),
   match_name: z.string().trim().min(1, "Add the match or description").max(160),
@@ -53,3 +62,4 @@ export const pickSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type PickInput = z.infer<typeof pickSchema>;
 export type EventInput = z.infer<typeof eventSchema>;
+export type ParlayLegInput = z.infer<typeof parlayLegSchema>;

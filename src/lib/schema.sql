@@ -53,6 +53,10 @@ create table if not exists picks (
   settled_at       timestamptz
 );
 
+-- Parlay legs: for pick_type = 'parlay', the individual selections and their odds.
+-- null for single picks. Each element: { "selection": text, "odds": number }.
+alter table picks add column if not exists legs jsonb;
+
 create index if not exists idx_picks_user    on picks(user_id);
 create index if not exists idx_picks_event   on picks(event_id);
 create index if not exists idx_events_owner   on events(created_by);

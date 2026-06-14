@@ -1,7 +1,26 @@
 import "server-only";
 import { sql } from "./db";
-import type { EventWithStats, Pick, SportEvent } from "./types";
+import type { EventWithStats, ParlayLeg, Pick, SportEvent } from "./types";
 import { computeStats } from "./stats";
+
+/** Coerce a raw jsonb `legs` value (object or string) into typed parlay legs, or null. */
+function mapLegs(raw: unknown): ParlayLeg[] | null {
+  if (raw == null) return null;
+  let value = raw;
+  if (typeof value === "string") {
+    try {
+      value = JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+  if (!Array.isArray(value)) return null;
+  const legs = value
+    .filter((l): l is Record<string, unknown> => typeof l === "object" && l !== null)
+    .map((l) => ({ selection: String(l.selection ?? ""), odds: Number(l.odds) }))
+    .filter((l) => l.selection.length > 0 && Number.isFinite(l.odds));
+  return legs.length > 0 ? legs : null;
+}
 
 /** Neon returns numeric/decimal columns as strings — coerce to numbers. */
 function mapPick(row: Record<string, unknown>): Pick {
@@ -19,6 +38,7 @@ function mapPick(row: Record<string, unknown>): Pick {
     notes: (row.notes as string | null) ?? null,
     profit: Number(row.profit),
     potential_return: Number(row.potential_return),
+    legs: mapLegs(row.legs),
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
     settled_at: (row.settled_at as string | null) ?? null,

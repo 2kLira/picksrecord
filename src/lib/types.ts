@@ -35,6 +35,12 @@ export interface SportEvent {
   updated_at: string;
 }
 
+/** A single leg of a parlay: one selection and its individual odds (in the pick's odds_format). */
+export interface ParlayLeg {
+  selection: string;
+  odds: number;
+}
+
 export interface Pick {
   id: string;
   user_id: string;
@@ -49,6 +55,8 @@ export interface Pick {
   notes: string | null;
   profit: number;
   potential_return: number;
+  /** For parlays: the individual legs. null for single picks. */
+  legs: ParlayLeg[] | null;
   created_at: string;
   updated_at: string;
   settled_at: string | null;
