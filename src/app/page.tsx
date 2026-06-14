@@ -6,6 +6,7 @@ import { getT } from "@/lib/i18n-server";
 import { Logo } from "@/components/Logo";
 import { EquityChart } from "@/components/charts/EquityChart";
 import { Reveal } from "@/components/motion/Reveal";
+import { AnimatedBackground } from "@/components/motion/AnimatedBackground";
 import { LanguageToggle } from "@/components/i18n/LanguageToggle";
 import type { EquityPoint } from "@/lib/stats";
 
@@ -28,7 +29,7 @@ export default async function Landing() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <div className="grid-noise pointer-events-none absolute inset-0 opacity-40" />
+      <AnimatedBackground />
 
       <header className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Logo />
@@ -39,7 +40,7 @@ export default async function Landing() {
           </Link>
           <Link
             href="/register"
-            className="rounded-xl bg-gradient-to-b from-brand to-brand-2 px-4 py-2 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
+            className="rounded-[2px] bg-brand px-4 py-2 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
           >
             {t.landing.getStarted}
           </Link>
@@ -59,13 +60,13 @@ export default async function Landing() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-brand to-brand-2 px-6 py-3 font-semibold text-base shadow-[0_8px_30px_-10px_rgba(70,230,164,0.6)] transition hover:brightness-110 active:scale-[0.98]"
+                className="inline-flex items-center gap-2 rounded-[2px] bg-brand px-5 py-3 font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
               >
                 {t.landing.ctaPrimary} <ArrowRight size={18} />
               </Link>
               <Link
                 href="/login"
-                className="rounded-xl border border-hair-strong px-6 py-3 font-medium transition hover:bg-surface active:scale-[0.98]"
+                className="rounded-[2px] px-5 py-3 font-medium text-fg hairline-faint transition hover:[box-shadow:var(--shadow-hairline)] active:scale-[0.98]"
               >
                 {t.common.signIn}
               </Link>

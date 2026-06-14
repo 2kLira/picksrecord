@@ -11,7 +11,7 @@ export default async function NotFound() {
       <p className="mt-2 max-w-sm text-muted">{t.notFound.body}</p>
       <Link
         href="/dashboard"
-        className="mt-6 rounded-xl bg-gradient-to-b from-brand to-brand-2 px-6 py-3 font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
+        className="mt-6 rounded-[2px] bg-brand px-5 py-3 font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
       >
         {t.notFound.cta}
       </Link>

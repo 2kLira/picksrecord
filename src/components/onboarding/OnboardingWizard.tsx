@@ -158,7 +158,7 @@ export function OnboardingWizard({
             type="button"
             onClick={next}
             disabled={!canNext}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-brand to-brand-2 px-6 py-2.5 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-[2px] bg-brand px-6 py-2.5 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98] disabled:opacity-40"
           >
             {t.common.continue} <ArrowRight size={16} />
           </button>
@@ -172,7 +172,7 @@ export function OnboardingWizard({
             ))}
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-brand to-brand-2 px-6 py-2.5 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-[2px] bg-brand px-6 py-2.5 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
             >
               {t.onboarding.finish} <Check size={16} />
             </button>

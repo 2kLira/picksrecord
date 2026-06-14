@@ -13,7 +13,9 @@ interface EquityChartProps {
 
 const W = 800;
 
-/** Animated cumulative-P&L curve: glowing stroke that draws in, with a gradient fill. */
+/** Animated cumulative-P&L curve in the Slash editorial *style*: a thin 1.5px stroke
+ *  that draws in over a layered gradient area fill — shadowless, ledger-precise.
+ *  Colors stay PicksRecord's own (brand mint / loss red). */
 export function EquityChart({ points, color = "#46e6a4", height = 220, className }: EquityChartProps) {
   const id = useId();
   const H = height;
@@ -57,20 +59,15 @@ export function EquityChart({ points, color = "#46e6a4", height = 220, className
       style={{ display: "block" }}
     >
       <defs>
+        {/* Layered area fill: bright peak → mid → transparent tail (molten-style depth). */}
         <linearGradient id={`fill-${id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={stroke} stopOpacity="0.28" />
+          <stop offset="0%" stopColor={stroke} stopOpacity="0.34" />
+          <stop offset="42%" stopColor={stroke} stopOpacity="0.14" />
           <stop offset="100%" stopColor={stroke} stopOpacity="0" />
         </linearGradient>
-        <filter id={`glow-${id}`} x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="4" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
 
-      {/* zero baseline */}
+      {/* zero baseline — 1px hairline */}
       <line x1="0" y1={zeroY} x2={W} y2={zeroY} stroke="#2a3a4d" strokeWidth="1" strokeDasharray="3 5" vectorEffect="non-scaling-stroke" />
 
       {/* area */}
@@ -82,16 +79,15 @@ export function EquityChart({ points, color = "#46e6a4", height = 220, className
         transition={{ duration: 0.8, delay: 0.5 }}
       />
 
-      {/* line */}
+      {/* line — thin 1.5px stroke, shadowless (Slash ledger style) */}
       <motion.path
         d={linePath}
         fill="none"
         stroke={stroke}
-        strokeWidth="2.5"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
-        filter={`url(#glow-${id})`}
         initial={{ pathLength: 0 }}
         animate={{ pathLength: 1 }}
         transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
@@ -101,7 +97,7 @@ export function EquityChart({ points, color = "#46e6a4", height = 220, className
       <motion.circle
         cx={x(points.length - 1)}
         cy={y(last.value)}
-        r="4"
+        r="3.5"
         fill={stroke}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

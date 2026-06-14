@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const baseField =
-  "w-full rounded-xl bg-base-2 border border-hair px-4 text-fg placeholder:text-faint " +
+  "w-full rounded-[2px] bg-base-2 border border-hair px-4 text-fg placeholder:text-faint " +
   "transition-colors focus:outline-none focus:border-brand/60 focus:ring-2 focus:ring-brand/20";
 
 export function Label({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {

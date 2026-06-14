@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 @theme {
+  /* ─────────────────────────────────────────────────────────────
+     PicksRecord palette (original) rendered in the AuthKit
+     "blueprint" *style*: matte flat surfaces, hairline/inset
+     elevation, sharp 2px controls, a faint architectural grid.
+     Colors are unchanged — only the structural language is borrowed.
+     ───────────────────────────────────────────────────────────── */
+
   /* Surfaces — midnight slate, never pure black */
   --color-base: #0a0e14;
   --color-base-2: #0d1219;
@@ -30,7 +37,8 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  --radius: 0.5rem;
+  /* Sharp utility radius — buttons & inputs sit at 2px (AuthKit shape language) */
+  --radius: 2px;
 }
 
 :root {
@@ -39,6 +47,15 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Elevation stack — blueprint style: inset hairlines + glow, near-black drop */
+  --shadow-glow: 0 0 6px 0 rgba(70, 230, 164, 0.30);
+  --shadow-hairline: inset 0 0 0 1px rgba(233, 238, 246, 0.10);
+  --shadow-hairline-faint: inset 0 0 0 1px rgba(233, 238, 246, 0.05);
+  --shadow-card:
+    inset 0 1px 1px 0 rgba(233, 238, 246, 0.06),
+    inset 0 24px 48px 0 rgba(233, 238, 246, 0.03),
+    0 24px 32px 0 rgba(5, 8, 13, 0.7);
 }
 
 @keyframes pr-settle-pulse {
@@ -61,16 +78,19 @@ html {
 }
 
 body {
-  background: var(--color-base);
+  background-color: var(--color-base);
   color: var(--color-fg);
   font-family: var(--font-sans);
   overflow-x: hidden;
-  /* Ambient field glow + faint grid */
-  background-image:
-    radial-gradient(900px 500px at 78% -8%, rgba(70, 230, 164, 0.07), transparent 60%),
-    radial-gradient(700px 500px at 0% 100%, rgba(47, 214, 196, 0.05), transparent 55%);
-  background-attachment: fixed;
   min-height: 100vh;
+  /* Blueprint: a top-center light wash over a faint ~40px architectural grid */
+  background-image:
+    radial-gradient(1000px 560px at 50% -12%, rgba(70, 230, 164, 0.08), transparent 62%),
+    radial-gradient(700px 500px at 0% 100%, rgba(47, 214, 196, 0.05), transparent 55%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  background-attachment: fixed;
 }
 
 ::selection {
@@ -100,15 +120,29 @@ body {
 
 @layer utilities {
   .glass {
-    background: color-mix(in oklab, var(--color-surface) 78%, transparent);
+    background: color-mix(in oklab, var(--color-base) 72%, transparent);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
   }
 
+  /* Matte, flat surface lifted by inset hairlines + a near-black drop (no gradient fill) */
   .card {
-    background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-base-2) 100%);
+    background: var(--color-surface);
     border: 1px solid var(--color-hair);
-    border-radius: 1rem;
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Eyebrow — quiet structural marker, mono + wide tracking (AuthKit style, brand color) */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-brand);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 
   .text-gradient {
@@ -122,11 +156,20 @@ body {
     background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 44px 44px;
+    background-size: 40px 40px;
   }
 
+  /* Soft brand glow — replaces drop shadows for accents */
   .glow-brand {
-    box-shadow: 0 0 0 1px rgba(70, 230, 164, 0.25), 0 8px 40px -12px rgba(70, 230, 164, 0.45);
+    box-shadow: var(--shadow-hairline), var(--shadow-glow);
+  }
+
+  .hairline {
+    box-shadow: var(--shadow-hairline);
+  }
+
+  .hairline-faint {
+    box-shadow: var(--shadow-hairline-faint);
   }
 }
 
