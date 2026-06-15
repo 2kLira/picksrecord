@@ -32,6 +32,60 @@ interface LegRow {
 
 const STATUSES: PickStatus[] = ["pending", "won", "lost", "push"];
 
+/** Keep only digits, one decimal point, and an optional leading minus. */
+function sanitizeOdds(v: string): string {
+  let s = v.replace(/[^\d.-]/g, "").replace(/(?!^)-/g, "");
+  const dot = s.indexOf(".");
+  if (dot !== -1) s = s.slice(0, dot + 1) + s.slice(dot + 1).replace(/\./g, "");
+  return s;
+}
+
+/**
+ * Odds input that works on mobile: a text field with a numeric (decimal) keypad plus a
+ * dedicated ± button — because the iOS number pad has no minus/plus key, American odds
+ * like -110 / +150 couldn't be typed otherwise.
+ */
+function OddsInput({
+  value,
+  onChange,
+  format,
+  className,
+  inputClassName,
+  ...rest
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  format: OddsFormat;
+  className?: string;
+  inputClassName?: string;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type">) {
+  const american = format === "american";
+  const isNeg = value.trim().startsWith("-");
+  return (
+    <div className={cn("relative", className)}>
+      {american && (
+        <button
+          type="button"
+          tabIndex={-1}
+          onClick={() => onChange(isNeg ? value.replace(/^-/, "") : "-" + value.replace(/^\+/, ""))}
+          aria-label="Toggle odds sign"
+          className="absolute left-1.5 top-1/2 z-10 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md border border-hair bg-base font-mono text-base font-semibold text-fg transition-colors hover:border-brand/50 active:scale-95"
+        >
+          {isNeg ? "−" : "+"}
+        </button>
+      )}
+      <Input
+        {...rest}
+        type="text"
+        inputMode="decimal"
+        value={value}
+        onChange={(e) => onChange(sanitizeOdds(e.target.value))}
+        className={cn("font-mono", american && "pl-10", inputClassName)}
+      />
+    </div>
+  );
+}
+
 function FormatToggle({ value, onChange }: { value: OddsFormat; onChange: (f: OddsFormat) => void }) {
   return (
     <div className="inline-flex rounded-lg border border-hair p-0.5">
@@ -195,15 +249,13 @@ export function PickForm({ action, events, defaultEventId, pick, submitLabel }: 
                       onChange={(e) => updateLeg(i, "selection", e.target.value)}
                       className="flex-1"
                     />
-                    <Input
+                    <OddsInput
                       aria-label={`${t.pickForm.legLabel(i + 1)} — ${t.pickForm.odds}`}
-                      type="number"
-                      step="0.01"
-                      inputMode="decimal"
+                      format={oddsFormat}
                       placeholder={oddsFormat === "american" ? "-110" : "1.91"}
                       value={leg.odds}
-                      onChange={(e) => updateLeg(i, "odds", e.target.value)}
-                      className="w-24 flex-none font-mono"
+                      onChange={(v) => updateLeg(i, "odds", v)}
+                      className="w-28 flex-none"
                     />
                     <button
                       type="button"
@@ -269,16 +321,13 @@ export function PickForm({ action, events, defaultEventId, pick, submitLabel }: 
                 </div>
               }
             >
-              <Input
+              <OddsInput
                 id="odds"
                 name="odds"
-                type="number"
-                step="0.01"
-                inputMode="decimal"
+                format={oddsFormat}
                 placeholder={oddsFormat === "american" ? "-110" : "1.91"}
                 value={odds}
-                onChange={(e) => setOdds(e.target.value)}
-                className="font-mono"
+                onChange={setOdds}
                 required
               />
             </Field>
