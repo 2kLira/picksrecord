@@ -14,13 +14,15 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * React Bits "Dock" magnification, adapted to a *vertical* sidebar with framer-motion
- * and the project's palette. Items grow as the cursor approaches (by Y proximity) and
- * reveal a label to the side. Supports a top group + a bottom-pinned group, and a few
- * item variants (nav / brand action / logo / avatar) so the whole sidebar can live here.
+ * React Bits "Dock" magnification, adapted with framer-motion and the project's palette.
+ * Works vertically (desktop sidebar) or horizontally (mobile bottom bar). Driven by
+ * pointer events, so it magnifies under a mouse on desktop and under a dragging finger
+ * on touch. Items grow with proximity and reveal a label; supports variants (nav / brand
+ * action / logo / avatar) and a bottom-pinned group (vertical only).
  */
 
 export type DockVariant = "default" | "brand" | "logo" | "avatar";
+export type DockOrientation = "vertical" | "horizontal";
 
 export interface DockNavItem {
   icon: ReactNode;
@@ -49,13 +51,15 @@ function itemLook(item: DockNavItem) {
 
 function DockItem({
   item,
-  mouseY,
+  pos,
+  orientation,
   distance,
   baseItemSize,
   magnification,
 }: {
   item: DockNavItem;
-  mouseY: MotionValue<number>;
+  pos: MotionValue<number>;
+  orientation: DockOrientation;
   distance: number;
   baseItemSize: number;
   magnification: number;
@@ -63,9 +67,11 @@ function DockItem({
   const ref = useRef<HTMLAnchorElement>(null);
   const [hovered, setHovered] = useState(false);
 
-  const mouseDistance = useTransform(mouseY, (val) => {
-    const rect = ref.current?.getBoundingClientRect() ?? { y: 0, height: baseItemSize };
-    return val - rect.y - baseItemSize / 2;
+  const mouseDistance = useTransform(pos, (val) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return distance + 1;
+    const start = orientation === "vertical" ? rect.y : rect.x;
+    return val - start - baseItemSize / 2;
   });
   const targetSize = useTransform(
     mouseDistance,
@@ -74,6 +80,11 @@ function DockItem({
   );
   const size = useSpring(targetSize, SPRING);
   const round = item.variant === "avatar" ? "rounded-full" : "rounded-xl";
+
+  const tooltipPos =
+    orientation === "vertical"
+      ? "left-full top-1/2 ml-3 -translate-y-1/2"
+      : "bottom-full left-1/2 mb-3 -translate-x-1/2";
 
   return (
     <motion.div style={{ width: size, height: size }} className="relative">
@@ -97,12 +108,15 @@ function DockItem({
       <AnimatePresence>
         {hovered && (
           <motion.span
-            initial={{ opacity: 0, x: -6 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -6 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.18 }}
             role="tooltip"
-            className="pointer-events-none absolute left-full top-1/2 z-20 ml-3 -translate-y-1/2 whitespace-nowrap rounded-md border border-hair bg-surface px-2 py-1 text-xs font-medium text-fg shadow-[0_8px_24px_-12px_rgba(0,0,0,0.8)]"
+            className={cn(
+              "pointer-events-none absolute z-20 whitespace-nowrap rounded-md border border-hair bg-surface px-2 py-1 text-xs font-medium text-fg shadow-[0_8px_24px_-12px_rgba(0,0,0,0.8)]",
+              tooltipPos,
+            )}
           >
             {item.label}
           </motion.span>
@@ -115,6 +129,7 @@ function DockItem({
 export function Dock({
   items,
   bottomItems = [],
+  orientation = "vertical",
   className = "",
   distance = 170,
   baseItemSize = 48,
@@ -122,18 +137,21 @@ export function Dock({
 }: {
   items: DockNavItem[];
   bottomItems?: DockNavItem[];
+  orientation?: DockOrientation;
   className?: string;
   distance?: number;
   baseItemSize?: number;
   magnification?: number;
 }) {
-  const mouseY = useMotionValue(Infinity);
+  const pos = useMotionValue(Infinity);
+  const vertical = orientation === "vertical";
 
   const render = (item: DockNavItem) => (
     <DockItem
       key={item.href + item.label}
       item={item}
-      mouseY={mouseY}
+      pos={pos}
+      orientation={orientation}
       distance={distance}
       baseItemSize={baseItemSize}
       magnification={magnification}
@@ -142,18 +160,28 @@ export function Dock({
 
   return (
     <div
-      onMouseMove={(e) => mouseY.set(e.pageY)}
-      onMouseLeave={() => mouseY.set(Infinity)}
+      onPointerMove={(e) => pos.set(vertical ? e.clientY : e.clientX)}
+      onPointerLeave={() => pos.set(Infinity)}
+      onPointerUp={() => pos.set(Infinity)}
+      onPointerCancel={() => pos.set(Infinity)}
       className={cn(
-        "flex w-fit flex-col items-center gap-3 rounded-2xl border border-hair bg-base-2/60 p-2",
+        "flex w-fit gap-3 rounded-2xl border border-hair bg-base-2/60 p-2",
+        vertical ? "flex-col items-center" : "flex-row items-end",
         className,
       )}
       role="toolbar"
-      aria-label="Sidebar navigation"
+      aria-label="Navigation dock"
     >
-      <div className="flex flex-col items-center gap-3">{items.map(render)}</div>
+      <div className={cn("flex gap-3", vertical ? "flex-col items-center" : "flex-row items-end")}>
+        {items.map(render)}
+      </div>
       {bottomItems.length > 0 && (
-        <div className="mt-auto flex flex-col items-center gap-3 border-t border-hair pt-3">
+        <div
+          className={cn(
+            "flex gap-3",
+            vertical ? "mt-auto flex-col items-center border-t border-hair pt-3" : "flex-row items-end",
+          )}
+        >
           {bottomItems.map(render)}
         </div>
       )}

@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Trophy, User, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useT } from "@/components/i18n/I18nProvider";
 import { Dock, type DockNavItem } from "@/components/motion/Dock";
 
@@ -48,28 +46,21 @@ export function SideNav({ user }: { user: { name: string; email: string } }) {
   return <Dock items={items} bottomItems={bottomItems} className="h-full" />;
 }
 
-/** Mobile bottom nav. */
+/** Mobile bottom nav — a horizontal magnify dock (drag a finger across to magnify). */
 export function MobileNav() {
   const pathname = usePathname();
   const t = useT();
+
+  const items: DockNavItem[] = [
+    { href: "/dashboard", label: t.nav.dashboard, active: isActive(pathname, "/dashboard"), icon: <LayoutDashboard /> },
+    { href: "/events", label: t.nav.events, active: isActive(pathname, "/events"), icon: <Trophy /> },
+    { href: "/picks/new", label: t.common.newPick, icon: <Plus />, variant: "brand" },
+    { href: "/profile", label: t.nav.profile, active: isActive(pathname, "/profile"), icon: <User /> },
+  ];
+
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-hair glass md:hidden">
-      {NAV.map(({ href, key, icon: Icon }) => {
-        const active = isActive(pathname, href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex flex-col items-center gap-1 py-3 text-[11px] font-medium transition-colors",
-              active ? "text-brand" : "text-muted",
-            )}
-          >
-            <Icon size={20} />
-            {t.nav[key]}
-          </Link>
-        );
-      })}
-    </nav>
+    <div className="fixed inset-x-0 bottom-3 z-40 flex justify-center px-4 lg:hidden">
+      <Dock orientation="horizontal" items={items} baseItemSize={46} magnification={62} distance={120} />
+    </div>
   );
 }

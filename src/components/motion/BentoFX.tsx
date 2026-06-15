@@ -20,24 +20,42 @@ const PARTICLE_COUNT = 12;
 export function BentoFX() {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    if (reduce || isMobile) return;
+    if (reduce) return;
+    // Touch devices have no cursor: skip spotlight/tilt/magnetism and instead
+    // trigger glow + particles + ripple on tap (see the coarse-pointer branch below).
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
 
     const proximity = SPOTLIGHT_RADIUS * 0.5;
     const fadeDistance = SPOTLIGHT_RADIUS * 0.75;
-
-    const spotlight = document.createElement("div");
-    spotlight.className = "bento-spotlight";
-    document.body.appendChild(spotlight);
 
     let raf = 0;
     let tiltedCard: HTMLElement | null = null;
     let particleCard: HTMLElement | null = null;
 
+    const clearParticlesOf = (card: HTMLElement | null) => {
+      card?.querySelectorAll(".bento-particle").forEach((p) => p.remove());
+    };
     const clearParticles = () => {
-      if (!particleCard) return;
-      particleCard.querySelectorAll(".bento-particle").forEach((p) => p.remove());
+      clearParticlesOf(particleCard);
       particleCard = null;
+    };
+
+    const ripple = (card: HTMLElement, x: number, y: number) => {
+      const rect = card.getBoundingClientRect();
+      const maxDistance = Math.max(
+        Math.hypot(x, y),
+        Math.hypot(x - rect.width, y),
+        Math.hypot(x, y - rect.height),
+        Math.hypot(x - rect.width, y - rect.height),
+      );
+      const el = document.createElement("div");
+      el.className = "bento-ripple";
+      el.style.width = `${maxDistance * 2}px`;
+      el.style.height = `${maxDistance * 2}px`;
+      el.style.left = `${x - maxDistance}px`;
+      el.style.top = `${y - maxDistance}px`;
+      card.appendChild(el);
+      el.addEventListener("animationend", () => el.remove());
     };
 
     const spawnParticles = (card: HTMLElement) => {
@@ -58,6 +76,35 @@ export function BentoFX() {
     const resetTilt = (card: HTMLElement) => {
       card.style.transform = "";
     };
+
+    // ── Touch equivalent: no cursor, so light up the tapped card on touchstart ──
+    if (coarse) {
+      const onTouch = (e: TouchEvent) => {
+        const touch = e.touches[0] ?? e.changedTouches[0];
+        if (!touch) return;
+        const el = document.elementFromPoint(touch.clientX, touch.clientY);
+        const card = el instanceof Element ? (el.closest(".card") as HTMLElement | null) : null;
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        card.style.setProperty("--glow-x", `${(x / rect.width) * 100}%`);
+        card.style.setProperty("--glow-y", `${(y / rect.height) * 100}%`);
+        card.style.setProperty("--glow-intensity", "1");
+        clearParticlesOf(card);
+        spawnParticles(card);
+        ripple(card, x, y);
+        window.setTimeout(() => card.style.setProperty("--glow-intensity", "0"), 650);
+        window.setTimeout(() => clearParticlesOf(card), 1300);
+      };
+      document.addEventListener("touchstart", onTouch, { passive: true });
+      return () => document.removeEventListener("touchstart", onTouch);
+    }
+
+    // ── Fine pointer (mouse): cursor spotlight + glow + tilt/magnetism ──
+    const spotlight = document.createElement("div");
+    spotlight.className = "bento-spotlight";
+    document.body.appendChild(spotlight);
 
     const update = (mx: number, my: number, target: EventTarget | null) => {
       spotlight.style.left = `${mx}px`;
@@ -134,22 +181,7 @@ export function BentoFX() {
       const card = e.target instanceof Element ? (e.target.closest(".card") as HTMLElement | null) : null;
       if (!card) return;
       const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const maxDistance = Math.max(
-        Math.hypot(x, y),
-        Math.hypot(x - rect.width, y),
-        Math.hypot(x, y - rect.height),
-        Math.hypot(x - rect.width, y - rect.height),
-      );
-      const ripple = document.createElement("div");
-      ripple.className = "bento-ripple";
-      ripple.style.width = `${maxDistance * 2}px`;
-      ripple.style.height = `${maxDistance * 2}px`;
-      ripple.style.left = `${x - maxDistance}px`;
-      ripple.style.top = `${y - maxDistance}px`;
-      card.appendChild(ripple);
-      ripple.addEventListener("animationend", () => ripple.remove());
+      ripple(card, e.clientX - rect.left, e.clientY - rect.top);
     };
 
     document.addEventListener("mousemove", onMove);
