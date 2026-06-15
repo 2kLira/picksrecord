@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
-export function PickCard({ pick, index = 0 }: { pick: Pick; index?: number }) {
+export function PickCard({ pick, index = 0, entrance = true }: { pick: Pick; index?: number; entrance?: boolean }) {
   const { currency } = usePrefs();
   const t = useT();
   const reduce = useReducedMotion();
@@ -63,10 +63,11 @@ export function PickCard({ pick, index = 0 }: { pick: Pick; index?: number }) {
         {!removing && (
           <motion.article
             layout
-            initial={{ opacity: 0, y: 16 }}
+            initial={entrance ? { opacity: 0, y: 16 } : false}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, filter: "blur(2px)", transition: { duration: 0.2 } }}
-            transition={{ duration: 0.45, delay: index * 0.04, ease: EASE_OUT }}
+            transition={{ duration: 0.45, delay: entrance ? index * 0.04 : 0, ease: EASE_OUT }}
+            data-no-tilt
             className="card group relative overflow-hidden"
           >
             <motion.div animate={controls} className="relative">

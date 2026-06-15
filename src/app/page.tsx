@@ -3,11 +3,10 @@ import { redirect } from "next/navigation";
 import { ArrowRight, ShieldCheck, TrendingUp, Layers } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { getT } from "@/lib/i18n-server";
-import { Logo } from "@/components/Logo";
 import { EquityChart } from "@/components/charts/EquityChart";
 import { Reveal } from "@/components/motion/Reveal";
 import { AnimatedBackground } from "@/components/motion/AnimatedBackground";
-import { LanguageToggle } from "@/components/i18n/LanguageToggle";
+import { CardNav } from "@/components/CardNav";
 import type { EquityPoint } from "@/lib/stats";
 
 const SAMPLE: EquityPoint[] = [0, 120, 60, 240, 180, 360, 320, 520, 610, 540, 760, 920].map((value, index) => ({
@@ -31,20 +30,27 @@ export default async function Landing() {
     <div className="relative min-h-screen overflow-hidden">
       <AnimatedBackground />
 
-      <header className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Logo />
-        <div className="flex items-center gap-2">
-          <LanguageToggle className="mr-1" />
-          <Link href="/login" className="rounded-xl px-4 py-2 text-sm text-muted transition hover:text-fg">
-            {t.common.signIn}
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-[2px] bg-brand px-4 py-2 text-sm font-semibold text-base transition hover:brightness-110 active:scale-[0.98]"
-          >
-            {t.landing.getStarted}
-          </Link>
-        </div>
+      <header className="relative py-6">
+        <CardNav
+          ctaLabel={t.landing.getStarted}
+          ctaHref="/register"
+          items={[
+            {
+              label: t.brand.eyebrow,
+              links: [
+                { label: t.landing.f1Title, href: "#features" },
+                { label: t.landing.f3Title, href: "#features" },
+              ],
+            },
+            {
+              label: t.nav.profile,
+              links: [
+                { label: t.common.signIn, href: "/login" },
+                { label: t.landing.getStarted, href: "/register" },
+              ],
+            },
+          ]}
+        />
       </header>
 
       <main className="relative mx-auto max-w-6xl px-6">
@@ -98,7 +104,7 @@ export default async function Landing() {
           </Reveal>
         </section>
 
-        <section className="grid gap-4 pb-24 sm:grid-cols-3">
+        <section id="features" className="grid gap-4 pb-24 sm:grid-cols-3">
           {features.map((f, i) => (
             <Reveal key={f.title} delay={i * 0.1}>
               <div className="card h-full p-6">

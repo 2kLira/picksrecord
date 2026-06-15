@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Filter } from "lucide-react";
 import type { Pick, PickStatus, PickType } from "@/lib/types";
 import { PICK_TYPE_LABELS } from "@/lib/types";
 import { PickCard } from "@/components/PickCard";
+import { AnimatedList } from "@/components/motion/AnimatedList";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { useT } from "@/components/i18n/I18nProvider";
@@ -58,13 +58,12 @@ export function EventPicksSection({ picks, eventId }: { picks: Pick[]; eventId: 
       )}
 
       {filtered.length > 0 ? (
-        <motion.div layout className="grid gap-4 sm:grid-cols-2">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((p, i) => (
-              <PickCard key={p.id} pick={p} index={i} />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        <AnimatedList
+          items={filtered}
+          getKey={(p) => p.id}
+          maxHeight={640}
+          renderItem={(p, i) => <PickCard pick={p} index={i} entrance={false} />}
+        />
       ) : picks.length === 0 ? (
         <EmptyState
           icon={<Plus size={24} />}

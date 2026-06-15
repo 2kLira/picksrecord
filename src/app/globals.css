@@ -127,6 +127,8 @@ body {
 
   /* Matte, flat surface lifted by inset hairlines + a near-black drop (no gradient fill) */
   .card {
+    position: relative;
+    overflow: hidden;
     background: var(--color-surface);
     border: 1px solid var(--color-hair);
     border-radius: 14px;
@@ -171,6 +173,100 @@ body {
   .hairline-faint {
     box-shadow: var(--shadow-hairline-faint);
   }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── MagicBento FX (mint) — cursor spotlight + per-card border glow ──
+   Driven by the global <BentoFX/> which sets the --glow-* vars per card. */
+.card {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
+  --glow-radius: 240px;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(70, 230, 164, calc(var(--glow-intensity) * 0.7)) 0%,
+    rgba(47, 214, 196, calc(var(--glow-intensity) * 0.35)) 30%,
+    transparent 60%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 1;
+  z-index: 1;
+}
+
+.bento-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(70, 230, 164, 1);
+  box-shadow: 0 0 6px rgba(70, 230, 164, 0.6);
+  pointer-events: none;
+  z-index: 6;
+  animation: bento-particle-float 3s ease-in-out infinite;
+}
+
+@keyframes bento-particle-float {
+  0% { transform: translate(0, 0); opacity: 1; }
+  50% { transform: translate(var(--pdx, 12px), var(--pdy, -16px)); opacity: 0.35; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+.bento-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 7;
+  background: radial-gradient(circle, rgba(70, 230, 164, 0.4) 0%, rgba(70, 230, 164, 0.18) 30%, transparent 70%);
+  animation: bento-ripple 0.8s ease-out forwards;
+}
+
+@keyframes bento-ripple {
+  from { transform: scale(0); opacity: 1; }
+  to { transform: scale(1); opacity: 0; }
+}
+
+.bento-spotlight {
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    circle,
+    rgba(70, 230, 164, 0.12) 0%,
+    rgba(70, 230, 164, 0.06) 20%,
+    rgba(47, 214, 196, 0.03) 40%,
+    transparent 70%
+  );
 }
 
 /* Respect reduced motion */

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { LayoutDashboard, Trophy, User } from "lucide-react";
+import { LayoutDashboard, Trophy, User, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/components/i18n/I18nProvider";
+import { Dock, type DockNavItem } from "@/components/motion/Dock";
 
 const NAV = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
@@ -17,37 +17,35 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Desktop vertical nav. */
-export function SideNav() {
+const LogoMark = () => (
+  <svg viewBox="0 0 24 24" fill="none">
+    <path d="M3 16.5L8.5 11l3.5 3.5L21 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M16 6h5v5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/** Desktop sidebar — the entire sidebar is a single vertical magnify dock. */
+export function SideNav({ user }: { user: { name: string; email: string } }) {
   const pathname = usePathname();
   const t = useT();
-  return (
-    <nav className="flex flex-col gap-1">
-      {NAV.map(({ href, key, icon: Icon }) => {
-        const active = isActive(pathname, href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors",
-              active ? "text-fg" : "text-muted hover:text-fg hover:bg-surface/60",
-            )}
-          >
-            {active && (
-              <motion.span
-                layoutId="nav-active"
-                className="absolute inset-0 rounded-xl border border-brand/25 bg-brand/10"
-                transition={{ type: "spring", stiffness: 400, damping: 32 }}
-              />
-            )}
-            <Icon size={18} className={cn("relative z-10", active && "text-brand")} />
-            <span className="relative z-10">{t.nav[key]}</span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
+  const initials = user.name.slice(0, 2).toUpperCase();
+
+  const items: DockNavItem[] = [
+    { href: "/dashboard", label: "PicksRecord", icon: <LogoMark />, variant: "logo" },
+    ...NAV.map(({ href, key, icon: Icon }) => ({
+      href,
+      label: t.nav[key],
+      active: isActive(pathname, href),
+      icon: <Icon />,
+    })),
+    { href: "/picks/new", label: t.common.newPick, icon: <Plus />, variant: "brand" as const },
+  ];
+
+  const bottomItems: DockNavItem[] = [
+    { href: "/profile", label: user.name, icon: <span>{initials}</span>, variant: "avatar" },
+  ];
+
+  return <Dock items={items} bottomItems={bottomItems} className="h-full" />;
 }
 
 /** Mobile bottom nav. */

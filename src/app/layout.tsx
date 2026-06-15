@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
+import { BentoFX } from "@/components/motion/BentoFX";
 import { getLocale } from "@/lib/i18n-server";
 import "./globals.css";
 
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body>
+        <BentoFX />
         <I18nProvider locale={locale}>{children}</I18nProvider>
       </body>
     </html>
