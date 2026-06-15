@@ -1,13 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Trophy, User, Plus } from "lucide-react";
+import { LayoutDashboard, Trophy, User, Plus, BarChart2 } from "lucide-react";
 import { useT } from "@/components/i18n/I18nProvider";
 import { Dock, type DockNavItem } from "@/components/motion/Dock";
 
 const NAV = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
   { href: "/events", key: "events", icon: Trophy },
+  { href: "/standings", key: "standings", icon: BarChart2 },
   { href: "/profile", key: "profile", icon: User },
 ] as const;
 
@@ -49,6 +50,7 @@ export function MobileNav() {
   const items: DockNavItem[] = [
     { href: "/dashboard", label: t.nav.dashboard, active: isActive(pathname, "/dashboard"), icon: <LayoutDashboard /> },
     { href: "/events", label: t.nav.events, active: isActive(pathname, "/events"), icon: <Trophy /> },
+    { href: "/standings", label: t.nav.standings, active: isActive(pathname, "/standings"), icon: <BarChart2 /> },
     { href: "/picks/new", label: t.common.newPick, icon: <Plus />, variant: "brand" },
     { href: "/profile", label: t.nav.profile, active: isActive(pathname, "/profile"), icon: <User /> },
   ];

@@ -29,7 +29,7 @@ const en = {
     staked: "staked",
     picks: "picks",
   },
-  nav: { dashboard: "Dashboard", events: "Events", profile: "Profile" },
+  nav: { dashboard: "Dashboard", events: "Events", standings: "Standings", profile: "Profile" },
   status: { won: "Won", lost: "Lost", pending: "Pending", push: "Push" },
   statusShort: { won: "Won", lost: "Lost", pending: "Pend", push: "Push" },
   pickTypes: {
@@ -251,6 +251,10 @@ const en = {
     semiFinal: "SF",
     thirdPlace: "3rd Place",
     final: "Final",
+    standingsEyebrow: "World Cup 2026",
+    standingsTitle: "Group Standings",
+    standingsSubtitle: "Updated as matches are played.",
+    colTeam: "Team",
   },
 };
 
@@ -279,7 +283,7 @@ const es: Dict = {
     staked: "apostado",
     picks: "picks",
   },
-  nav: { dashboard: "Panel", events: "Eventos", profile: "Perfil" },
+  nav: { dashboard: "Panel", events: "Eventos", standings: "Tabla", profile: "Perfil" },
   status: { won: "Ganado", lost: "Perdido", pending: "Pendiente", push: "Push" },
   statusShort: { won: "Gan", lost: "Perd", pending: "Pend", push: "Push" },
   pickTypes: {
@@ -501,6 +505,10 @@ const es: Dict = {
     semiFinal: "Semis",
     thirdPlace: "3er Lugar",
     final: "Final",
+    standingsEyebrow: "Mundial 2026",
+    standingsTitle: "Clasificación por Grupos",
+    standingsSubtitle: "Se actualiza conforme se juegan los partidos.",
+    colTeam: "Equipo",
   },
 };
 

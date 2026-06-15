@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/session";
 
-const PROTECTED = ["/dashboard", "/events", "/picks", "/profile", "/onboarding"];
+const PROTECTED = ["/dashboard", "/events", "/picks", "/profile", "/onboarding", "/standings"];
 const AUTH_ROUTES = ["/login", "/register"];
 
 export async function middleware(req: NextRequest) {
@@ -35,6 +35,7 @@ export const config = {
     "/picks/:path*",
     "/profile/:path*",
     "/onboarding",
+    "/standings/:path*",
     "/login",
     "/register",
   ],
