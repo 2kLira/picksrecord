@@ -2,6 +2,7 @@ import { Trophy } from "lucide-react";
 import { getT } from "@/lib/i18n-server";
 import type { Dict } from "@/lib/i18n";
 import { LiveRefresher } from "@/components/motion/LiveRefresher";
+import { LocalTime } from "@/components/LocalTime";
 
 // ─── API-Football types ───────────────────────────────────────────────────────
 
@@ -155,17 +156,6 @@ async function fromStatsApi(today: string, t: Dict): Promise<TodayMatch[]> {
   }
 }
 
-// ─── Formatters ───────────────────────────────────────────────────────────────
-
-function fmtKickoff(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-    hour12: false,
-  });
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export async function WorldCupToday() {
@@ -173,7 +163,8 @@ export async function WorldCupToday() {
   const today = new Date().toISOString().slice(0, 10);
 
   const afMatches = await fromApiFootball(today, t);
-  const matches = afMatches.length > 0 ? afMatches : await fromStatsApi(today, t);
+  const matches = (afMatches.length > 0 ? afMatches : await fromStatsApi(today, t))
+    .sort((a, b) => a.kickoffUtc.localeCompare(b.kickoffUtc));
 
   if (matches.length === 0) return null;
 
@@ -240,7 +231,7 @@ export async function WorldCupToday() {
               {m.phase === "ns" && (
                 <div>
                   <div className="font-mono text-xs font-semibold text-brand">
-                    {fmtKickoff(m.kickoffUtc)} UTC
+                    <LocalTime iso={m.kickoffUtc} />
                   </div>
                   <div className="font-mono text-[10px] capitalize text-faint">{m.city}</div>
                 </div>
