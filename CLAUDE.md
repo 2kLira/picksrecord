@@ -16,7 +16,7 @@ npm run lint      # next lint
 npm run migrate   # apply src/lib/schema.sql to DATABASE_URL (idempotent)
 ```
 
-`.env.local` must contain `DATABASE_URL` (Neon Postgres connection string) and `AUTH_SECRET` (long random string; `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`). There is no test runner — `scripts/smoke.mjs` and `scripts/authtest.mjs` are ad-hoc manual scripts.
+`.env.local` must contain `DATABASE_URL` (Neon Postgres connection string) and `AUTH_SECRET` (long random string; `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`). Optionally, `API_FOOTBALL_KEY` (from api-sports.io free tier) enables live scores in the `WorldCupToday` dashboard widget — without it, the widget falls back to static fixture data. There is no test runner — `scripts/smoke.mjs` and `scripts/authtest.mjs` are ad-hoc manual scripts.
 
 Requires a Node server runtime (Server Actions, middleware, Neon, session cookies) — **static export / GitHub Pages will not work**. Deploy to Vercel or any Node host.
 
@@ -43,6 +43,7 @@ Mutations are **Server Actions** in `src/app/actions/{auth,events,picks,profile}
 All P&L logic is centralized; don't reinvent it inline:
 - `src/lib/odds.ts` — `profitOnWin`, `settledProfit` (won → +profit, lost → −stake, push/pending → 0), `potentialReturn`, `convertOdds`, `impliedProbability`. American `+150 → stake·odds/100`, `−120 → stake·100/|odds|`; decimal `2.50 → stake·(odds−1)`.
 - `src/lib/stats.ts` — `computeStats` (totals/ROI/winRate; **pending never counts** toward P&L or win rate; winRate denominator is won+lost only), `currentStreak`, `buildEquityCurve`.
+- `src/lib/format.ts` — display formatting: `formatMoney` (currency symbol + sign), `formatOdds` (american/decimal), `formatPercent`, `formatDate`, `relativeTime`. Use these instead of inline formatting.
 - Picks store **denormalized `profit` and `potential_return`** computed at write time in the action. When status or stake/odds change, recompute via `settledProfit`/`potentialReturn` — never trust a stale stored value. `settlePickAction` accepts an optional `profitOverride` for custom payouts (partial cashouts).
 
 **Neon gotcha:** `numeric` columns come back as **strings**. `mapPick()` in `queries.ts` coerces them; route raw pick rows through it rather than using them directly.

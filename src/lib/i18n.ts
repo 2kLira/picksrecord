@@ -242,6 +242,16 @@ const en = {
     body: "This page isn't part of your ledger. Let's get you back on track.",
     cta: "Back to dashboard",
   },
+  worldCup: {
+    todayTitle: "World Cup · Today",
+    group: "Group",
+    roundOf32: "Round of 32",
+    roundOf16: "Round of 16",
+    quarterFinal: "QF",
+    semiFinal: "SF",
+    thirdPlace: "3rd Place",
+    final: "Final",
+  },
 };
 
 export type Dict = typeof en;
@@ -481,6 +491,16 @@ const es: Dict = {
     title: "Perdiste el hilo",
     body: "Esta página no es parte de tu ledger. Vamos a regresarte al camino.",
     cta: "Volver al panel",
+  },
+  worldCup: {
+    todayTitle: "Mundial · Hoy",
+    group: "Grupo",
+    roundOf32: "Ronda de 32",
+    roundOf16: "Octavos",
+    quarterFinal: "Cuartos",
+    semiFinal: "Semis",
+    thirdPlace: "3er Lugar",
+    final: "Final",
   },
 };
 

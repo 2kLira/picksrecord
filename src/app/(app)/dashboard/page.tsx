@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { AnimatedMoney } from "@/components/motion/AnimatedMoney";
 import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
+import { WorldCupToday } from "@/components/WorldCupToday";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -31,6 +32,7 @@ export default async function DashboardPage() {
     return (
       <div>
         <PageHeader eyebrow={t.dashboard.eyebrow} title={t.dashboard.welcome(firstName)} subtitle={t.dashboard.emptySubtitle} />
+        <WorldCupToday />
         <EmptyState
           icon={<Trophy size={26} />}
           title={t.dashboard.createFirstTitle}
@@ -121,6 +123,8 @@ export default async function DashboardPage() {
         <StatCard label={t.dashboard.lost} value={stats.lost} tone="neg" delay={0.1} />
         <StatCard label={t.dashboard.push} value={stats.push} tone="default" delay={0.15} />
       </div>
+
+      <WorldCupToday />
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         {/* Recent picks */}
