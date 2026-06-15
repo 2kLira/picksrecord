@@ -18,8 +18,9 @@ export function PickRow({ pick, index = 0 }: { pick: Pick; index?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.4, delay: Math.min(index, 6) * 0.05 }}
     >
       <Link
         href={`/picks/${pick.id}/edit`}

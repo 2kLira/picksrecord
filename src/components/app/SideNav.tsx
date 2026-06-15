@@ -22,11 +22,10 @@ const LogoMark = () => (
   </svg>
 );
 
-/** Desktop sidebar — the entire sidebar is a single vertical magnify dock. */
-export function SideNav({ user }: { user: { name: string; email: string } }) {
+/** Desktop sidebar nav — a single vertical magnify dock (centered in the bar). */
+export function SideNav() {
   const pathname = usePathname();
   const t = useT();
-  const initials = user.name.slice(0, 2).toUpperCase();
 
   const items: DockNavItem[] = [
     { href: "/dashboard", label: "PicksRecord", icon: <LogoMark />, variant: "logo" },
@@ -39,11 +38,7 @@ export function SideNav({ user }: { user: { name: string; email: string } }) {
     { href: "/picks/new", label: t.common.newPick, icon: <Plus />, variant: "brand" as const },
   ];
 
-  const bottomItems: DockNavItem[] = [
-    { href: "/profile", label: user.name, icon: <span>{initials}</span>, variant: "avatar" },
-  ];
-
-  return <Dock items={items} bottomItems={bottomItems} className="h-full" />;
+  return <Dock items={items} />;
 }
 
 /** Mobile bottom nav — a horizontal magnify dock (drag a finger across to magnify). */

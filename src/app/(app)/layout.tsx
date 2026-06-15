@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { SideNav, MobileNav } from "@/components/app/SideNav";
@@ -7,13 +8,23 @@ import { LanguageToggle } from "@/components/i18n/LanguageToggle";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+  const initials = user.name.slice(0, 2).toUpperCase();
 
   return (
     <UserPrefsProvider value={{ name: user.name, currency: user.currency, oddsFormat: user.preferred_odds_format }}>
       <div className="min-h-screen lg:grid lg:grid-cols-[auto_1fr]">
-        {/* Sidebar (desktop) — just the dock column */}
-        <aside className="sticky top-0 hidden h-screen py-4 pl-4 lg:flex">
-          <SideNav user={{ name: user.name, email: user.email }} />
+        {/* Sidebar (desktop) — nav dock centered, user pinned to the bottom */}
+        <aside className="sticky top-0 hidden h-screen flex-col items-center pl-4 lg:flex">
+          <div className="flex flex-1 items-center">
+            <SideNav />
+          </div>
+          <Link
+            href="/profile"
+            aria-label={user.name}
+            className="mb-5 grid h-12 w-12 place-items-center rounded-full border border-hair bg-elevated font-mono text-xs font-semibold text-brand transition-colors hover:text-fg"
+          >
+            {initials}
+          </Link>
         </aside>
 
         {/* Main */}

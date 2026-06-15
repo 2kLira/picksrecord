@@ -164,24 +164,22 @@ export function Dock({
       onPointerLeave={() => pos.set(Infinity)}
       onPointerUp={() => pos.set(Infinity)}
       onPointerCancel={() => pos.set(Infinity)}
+      // Fixed cross-axis size + start alignment so magnified items overflow (stick out)
+      // toward the content instead of just widening the whole panel.
+      style={vertical ? { width: baseItemSize + 16 } : { height: baseItemSize + 16 }}
       className={cn(
-        "flex w-fit gap-3 rounded-2xl border border-hair bg-base-2/60 p-2",
-        vertical ? "flex-col items-center" : "flex-row items-end",
+        "flex gap-3 rounded-2xl border border-hair bg-base-2/60 p-2",
+        vertical ? "flex-col items-start" : "flex-row items-end",
         className,
       )}
       role="toolbar"
       aria-label="Navigation dock"
     >
-      <div className={cn("flex gap-3", vertical ? "flex-col items-center" : "flex-row items-end")}>
+      <div className={cn("flex gap-3", vertical ? "flex-col items-start" : "flex-row items-end")}>
         {items.map(render)}
       </div>
       {bottomItems.length > 0 && (
-        <div
-          className={cn(
-            "flex gap-3",
-            vertical ? "mt-auto flex-col items-center border-t border-hair pt-3" : "flex-row items-end",
-          )}
-        >
+        <div className={cn("flex gap-3", vertical ? "mt-auto flex-col items-start" : "flex-row items-end")}>
           {bottomItems.map(render)}
         </div>
       )}
